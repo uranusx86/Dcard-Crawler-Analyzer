@@ -1,32 +1,32 @@
 # Dcard-Crawler-Analyzer
-get content and analyze !
+get content and analyze ! <br>
 And provide a docker image version
 
 # Dependency
 python3
 
 ## pypi package
-flask
-flask_script
-flask_migrate
-Flask-SQLAlchemy
-gunicorn
-requests
-cfscrape
-jieba
+* flask
+* flask_script
+* flask_migrate
+* Flask-SQLAlchemy
+* gunicorn
+* requests
+* cfscrape
+* jieba
 
 ## apt package
-nodejs 8+
+* nodejs 8+
 
 # Install
 ```bash=
 # install dependency
 apt-get install nodejs
-pip install requirements.txt   # it highly recommend install package in the virual env
+pip install requirements.txt   # it highly recommend install packages in the virual env
 
 # environment variable
 export APP_SETTINGS="config.DevelopmentConfig"
-export DATABASE_URL="sqlite:///storage/dcard"
+export DATABASE_URL="sqlite:///WHERE_YOU_WANT_PUT_DB"
 
 # database migration
 python3 app/manage.py db init
