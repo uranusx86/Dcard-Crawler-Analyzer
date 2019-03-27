@@ -1,0 +1,8 @@
+flask
+flask_script
+flask_migrate
+Flask-SQLAlchemy
+gunicorn
+requests
+cfscrape
+jieba

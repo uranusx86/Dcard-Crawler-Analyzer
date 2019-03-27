@@ -1,0 +1,12 @@
+USER=root
+HOME=/root/
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:$HOME/bin
+PYTHONPATH=/app
+MAILTO=root
+LANG=en_US.UTF-8
+APP_SETTINGS="config.DevelopmentConfig"
+DATABASE_URL="sqlite:////app/storage/dcard"
+*/20 17-23 * * * python3 /app/crawler.py > /app/error.log 2>&1
+*/20 0-3 * * * python3 /app/crawler.py > /app/error.log 2>&1
+* * * * * env > /app/status.txt

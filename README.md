@@ -29,6 +29,7 @@ export APP_SETTINGS="config.DevelopmentConfig"
 export DATABASE_URL="sqlite:///WHERE_YOU_WANT_PUT_DB"
 
 # database migration
+cd app
 python3 app/manage.py db init
 python3 app/manage.py db migrate
 python3 app/manage.py db upgrade
@@ -36,6 +37,7 @@ python3 app/manage.py db upgrade
 
 # Run
 ```bash=
+cd app
 python3 app/crawler.py
 ```
 
