@@ -12,7 +12,7 @@ alembic upgrade head
 "
 
 source /app/.env
-#python3 /app/manage.py db init   # for no "migrations" folder
+python3 /app/manage.py db init   # for no "migrations" folder
 #python3 /app/manage.py db stamp head    # for already exist "migrations" folder
 python3 /app/manage.py db migrate
 python3 /app/manage.py db upgrade
