@@ -1,8 +1,9 @@
 USER=root
-HOME=/root/
+HOME=/app/
 SHELL=/bin/bash
 PATH=/usr/local/bin:/usr/local/sbin:/sbin:/bin:/usr/sbin:/usr/bin:$HOME/bin
 PYTHONPATH=/app
+PYTHONIOENCODING=utf-8
 MAILTO=root
 LANG=en_US.UTF-8
 APP_SETTINGS="config.DevelopmentConfig"

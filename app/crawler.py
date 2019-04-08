@@ -356,6 +356,7 @@ if __name__ == '__main__':
                     db.session.add(new_comt)
                 except Exception as e:
                     logging.error(traceback.format_exc())
+                    logging.error(idx)
                     logging.error(comment_list[idx])
 
             db.session.commit()

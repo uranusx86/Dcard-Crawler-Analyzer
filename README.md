@@ -30,15 +30,15 @@ export DATABASE_URL="sqlite:///WHERE_YOU_WANT_PUT_DB"
 
 # database migration
 cd app
-python3 app/manage.py db init
-python3 app/manage.py db migrate
-python3 app/manage.py db upgrade
+python3 manage.py db init
+python3 manage.py db migrate
+python3 manage.py db upgrade
 ```
 
 # Run
 ```bash=
 cd app
-python3 app/crawler.py
+python3 crawler.py
 ```
 
 # Docker image
