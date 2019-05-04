@@ -1,5 +1,5 @@
 # Dcard-Crawler-Analyzer
-get content and analyze ! <br>
+get Dcard forum content and analyze ! <br>
 And provide a docker image version
 
 # Dependency
