@@ -39,13 +39,14 @@ for article in article_list:
     soup = BeautifulSoup(r.content, 'html.parser')
     article_content = soup.select('#article_content>p')[0].text
 
-    #comments = soup.select('#commentList > .item')
-    comments = soup.findAll(lambda tag: "data-id" in tag.attrs) # remove ads
+    comments = soup.select('#commentList > .item[data-id|="comment"]')
+    #comments = soup.select('#commentList')
+    #comments = comments.findAll(lambda tag: "data-id" in tag.attrs) # another method
 
     if len(comments) == 0:
         clean_html = soup.prettify()  # clean up the HTML tree
         soup = BeautifulSoup(clean_html, 'html.parser')
-        comments = soup.select('#commentList > .item')
+        comments = soup.select('#commentList > .item[data-id|="comment"]')
 
     for comment in comments:
         try:
@@ -57,8 +58,11 @@ for article in article_list:
             nickname = nickname[0].text.strip('\t\n') if len(nickname) != 0 else comment_body.select('.header')[0].text.strip('\t\n')  # 匿名
 
             meta = comment_body.select('.meta')[0]
-            floor = meta.select('a')[0].text
+            floor = meta.select('a')[0].text[1:]
             post_time = meta.select('span')[0].get("ng-bind")
+
+            likes_btn = comment.select('.mfb > .label')[0]
+            likes = likes_btn.text
 
             comment = comment_body.select('.description > p')[0].text
             response = comment_body.select('.description > .tertiary > p')
@@ -66,6 +70,7 @@ for article in article_list:
             print("-"*40)
             print(floor)
             print(nickname)
+            print(likes)
             print(comment)
             print(response)
             print("-"*40)
