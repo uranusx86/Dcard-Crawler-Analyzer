@@ -1,6 +1,6 @@
 # Dcard-Crawler-Analyzer
-get Dcard forum content and analyze ! <br>
-And provide a docker image version
+get Dcard & Meteor forum content and analyze ! <br>
+And also provide a docker image version
 
 # Dependency
 python3
@@ -38,7 +38,8 @@ python3 manage.py db upgrade
 # Run
 ```bash=
 cd app
-python3 crawler.py
+python3 crawler.py  # for Dcard
+python3 meteor.py   # for Meteor
 ```
 
 # Docker image

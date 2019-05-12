@@ -1,7 +1,12 @@
 import requests, urllib
 import json
 import logging, traceback
+from datetime import timedelta
+from datetime import datetime
 from bs4 import BeautifulSoup
+import abc
+from web_app import db
+from meteor_db import meteor_articles, meteor_comments  # must under web_app import
 
 board_name_url = "https://meteor.today/board/get_boards"
 content_url = "https://meteor.today/article/get_basic_article_content_short/"
@@ -39,6 +44,22 @@ for article in article_list:
     soup = BeautifulSoup(r.content, 'html.parser')
     article_content = soup.select('#article_content>p')[0].text
 
+    print(article["createdAt"])
+
+    new_artl = meteor_articles(
+                    id = article["id"],
+                    shortid = article["shortId"],
+                    gender = 0 if article["authorGender"] == 'female' else 1,
+                    author = article["authorAlias"],
+                    school = article["authorSchoolName"],
+                    time = datetime.strptime(article["createdAt"], "%Y-%m-%dT%H:%M:%S.%fZ"),
+                    likes = article["starLength"],
+                    title = article["title"],
+                    content = article["content"]
+                )
+    db.session.add(new_artl)
+    db.session.commit()
+
     comments = soup.select('#commentList > .item[data-id|="comment"]')
     #comments = soup.select('#commentList')
     #comments = comments.findAll(lambda tag: "data-id" in tag.attrs) # another method
@@ -50,12 +71,27 @@ for article in article_list:
 
     for comment in comments:
         try:
-            avatar = comment.select('.image > img')[0].get('src')
-
             comment_body = comment.select('.content')[0]
 
-            nickname = comment_body.select('.header > a')
-            nickname = nickname[0].text.strip('\t\n') if len(nickname) != 0 else comment_body.select('.header')[0].text.strip('\t\n')  # 匿名
+            nickname_meta = comment_body.select('.header > a')
+            nickname = nickname_meta[0].text.strip('\t\n') if len(nickname_meta) != 0 else comment_body.select('.header')[0].text.strip('\t\n')  # 匿名
+
+            avatar = comment.select('.image > img')[0].get('src')
+            avatar = avatar.split("_")[1]
+            if avatar == "1" or avatar == "2" or avatar == "6":
+                gender = 0
+            elif avatar == "3" or avatar == "4" or avatar == "5":
+                gender = 1
+            else:
+                if nickname == "匿名":
+                    gender = -1
+                else:
+                    data = {
+                            targetId: nickname_meta[0].get('href').split("/")[-1],
+                            page: 0
+                        }
+                    r = requests.post("https://meteor.today/user/get_follow_single_user", json=data)
+                    gender = 0 if r.json()["author"]["gender"] == "female" else 1
 
             meta = comment_body.select('.meta')[0]
             floor = meta.select('a')[0].text[1:]
@@ -69,11 +105,28 @@ for article in article_list:
             response = response[0].text if len(response) != 0 else ""
             print("-"*40)
             print(floor)
+            print(datetime.strptime(post_time.split("'")[1], "%a %b %d %Y %H:%M:%S GMT+0000 (UTC)"))
             print(nickname)
             print(likes)
             print(comment)
             print(response)
             print("-"*40)
+
+            new_comt = meteor_comments(
+                            id = article["id"],
+                            shortid = article["shortId"],
+                            author = nickname,
+                            gender = gender,
+                            floor = floor,
+                            time = datetime.strptime(post_time.split("'")[1], "%a %b %d %Y %H:%M:%S GMT+0000 (UTC)"),
+                            likes = likes,
+                            content = comment,
+                            response = response
+                        )
+            db.session.add(new_comt)
+
         except Exception as e:
             print(traceback.format_exc())
             print(comment)
+
+    db.session.commit()

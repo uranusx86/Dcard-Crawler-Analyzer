@@ -9,6 +9,7 @@ db = SQLAlchemy(app)
 
 #from models import Book
 from models import dcard_article, dcard_comment
+from meteor_db import meteor_articles, meteor_comments
 
 @app.route('/')
 def index():
