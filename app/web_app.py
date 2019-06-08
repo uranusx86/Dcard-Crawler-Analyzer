@@ -8,7 +8,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 #from models import Book
-from models import dcard_article, dcard_comment
+from dcard_db import dcard_articles, dcard_comments
 from meteor_db import meteor_articles, meteor_comments
 
 @app.route('/')

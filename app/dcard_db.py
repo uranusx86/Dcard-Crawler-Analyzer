@@ -1,7 +1,7 @@
 from web_app import db
 
-class dcard_article(db.Model):
-    __tablename__ = 'articles'
+class dcard_articles(db.Model):
+    __tablename__ = 'dcard_articles'
 
     id = db.Column(db.Integer, primary_key=True)
     art_id = db.Column(db.Integer())        # <= id
@@ -39,9 +39,9 @@ class dcard_article(db.Model):
             'content': self.art_content
         }
 
-class dcard_comment(db.Model):
+class dcard_comments(db.Model):
     # comment number is according to article api "commentCount" field
-    __tablename__ = 'comment'
+    __tablename__ = 'dcard_comments'
 
     id = db.Column(db.Integer, primary_key=True)
     art_id = db.Column(db.Integer())           # <= postId

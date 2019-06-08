@@ -38,13 +38,13 @@ python3 manage.py db upgrade
 # Run
 ```bash=
 cd app
-python3 crawler.py  # for Dcard
+python3 dcard.py  # for Dcard
 python3 meteor.py   # for Meteor
 ```
 
 # Docker image
 You can also build crawler from dockerfile
 ```bash=
-docker build uranusx86/DcardCrawler
-docker run -dt --name dcard_crawler -p 8080:80 uranusx86/DcardCrawler
+docker build uranusx86/ForumCrawler
+docker run -dt --name forum_crawler -p 8080:80 uranusx86/ForumCrawler
 ```
