@@ -110,15 +110,22 @@ class Meteor_crawler(Crawler):
                     soup = BeautifulSoup(clean_html, 'html.parser')
                     comments = soup.select('#commentList > .item[data-id|="comment"]')
 
+                cmt_count = db.session.query(meteor_comments.comment_floor).filter_by(art_id=article["id"]).count()
+
+                if cmt_count is None:
+                    cmt_query_begin = 0
+                else:
+                    cmt_query_begin = cmt_count
+
                 comments_list = []
-                for comment in comments:
+                for comt_ind in range(cmt_query_begin, len(comments)):
                     try:
-                        comment_body = comment.select('.content')[0]
+                        comment_body = comments[comt_ind].select('.content')[0]
 
                         nickname_meta = comment_body.select('.header > a')
                         nickname = nickname_meta[0].text.strip('\t\n') if len(nickname_meta) != 0 else comment_body.select('.header')[0].text.strip('\t\n')  # 匿名
 
-                        avatar = comment.select('.image > img')[0].get('src')
+                        avatar = comments[comt_ind].select('.image > img')[0].get('src')
                         avatar = avatar.split("_")[1]
                         if avatar == "1" or avatar == "2" or avatar == "6":
                             gender = 0
@@ -138,7 +145,7 @@ class Meteor_crawler(Crawler):
                         floor = meta.select('a')[0].text[1:]
                         post_time = meta.select('span')[0].get("ng-bind")
 
-                        likes_btn = comment.select('.mfb > .label')[0]
+                        likes_btn = comments[comt_ind].select('.mfb > .label')[0]
                         likes = likes_btn.text
 
                         comment = comment_body.select('.description > p')[0].text
@@ -159,7 +166,7 @@ class Meteor_crawler(Crawler):
                     except Exception as e:
                         local_var_key = locals()
                         logging.error(traceback.format_exc())
-                        logging.error({key: local_var_key[key] for key in local_var_key if key != "comments"})
+                        logging.error({key: local_var_key[key] for key in local_var_key if key != "comments_list"})
                         logging.error("")
 
                 if len(comments_list) == 0:
@@ -177,19 +184,25 @@ class Meteor_crawler(Crawler):
 
     def save_data(self, article_gen, comt_gen):
         for article in article_gen:
+            updated_article = meteor_articles.query.filter_by(art_id=article["id"]).first()
             try:
-                new_artl = meteor_articles(
-                    id = article["id"],
-                    shortid = article["shortId"],
-                    gender = article["authorGender"],
-                    author = article["authorAlias"],
-                    school = article["authorSchoolName"],
-                    time = article["createdAt"],
-                    likes = article["starLength"],
-                    title = article["title"],
-                    content = article["content"]
-                )
-                db.session.add(new_artl)
+                if updated_article is None:
+                    new_artl = meteor_articles(
+                        id = article["id"],
+                        shortid = article["shortId"],
+                        gender = article["authorGender"],
+                        author = article["authorAlias"],
+                        school = article["authorSchoolName"],
+                        time = article["createdAt"],
+                        likes = article["starLength"],
+                        title = article["title"],
+                        content = article["content"]
+                    )
+                    db.session.add(new_artl)
+                else:
+                    # update article
+                    article["content"] = self.compare_modify_list(article["content"], updated_article.art_content)
+                    updated_article.art_content = article["content"]
             except Exception as e:
                 local_var_key = locals()
                 logging.error(traceback.format_exc())
