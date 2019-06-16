@@ -1,7 +1,8 @@
 import abc
 import collections
 import requests
-import logging
+import logging, traceback
+import time
 
 class Crawler(metaclass=abc.ABCMeta):  # Abstract base class
     def __init__(self, req_module=requests):

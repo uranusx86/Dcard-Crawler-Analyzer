@@ -63,7 +63,7 @@ class Dcard_crawler(Crawler):
         last_article_datetime = datetime.now()
         before = 0
         while (datetime.now() - last_article_datetime).days < 3:
-            time.sleep(random.uniform(0.5,1.0))
+            #time.sleep(random.uniform(0.5,1.0))
             try:
                 query_url = query_api + ("&before="+str(before) if before != 0 else "")
                 article_list_str = self.retry_if_fail(query_url, retry_num=5, delay_time=5, error_msg="Get article list fail! before: {}".format(before))
@@ -88,7 +88,7 @@ class Dcard_crawler(Crawler):
                 print("if provide a NULL post id, must provide a article list")
                 return
             for article in kw["list_generator"]:
-                time.sleep(random.uniform(0.5,1.0))
+                #time.sleep(random.uniform(0.5,1.0))
                 query_api = self.proxy + self.article_url.format(article["id"])
                 article_encode_str = self.retry_if_fail(query_api, retry_num=5, delay_time=5, error_msg="Get article fail! post id: {}".format(article["id"]))
                 article = self.response_decode(article_encode_str)
@@ -128,10 +128,12 @@ class Dcard_crawler(Crawler):
                 comments_list = []
                 for comt_ind in range(cmt_query_begin, article["commentCount"], 100):
                     try:
-                        time.sleep(random.uniform(0.5,1.0))
+                        #time.sleep(random.uniform(0.5,1.0))
                         query_api = self.proxy + self.comment_url.format(article["id"], comt_ind, kw['limit'])
                         comments_encode_str = self.retry_if_fail(query_api, retry_num=5, delay_time=5, error_msg="Get comment fail! post id: {}, after: {}".format(article["id"], comt_ind))
                         comments = self.response_decode(comments_encode_str)
+                        if type(comments) is dict and 'error' in comments:
+                            continue
                         for a_comment in comments:
                             a_comment["art_anonymousDepartment"] = article["anonymousDepartment"]
                         comments_list.extend(comments)

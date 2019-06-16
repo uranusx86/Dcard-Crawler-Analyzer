@@ -5,4 +5,5 @@ Flask-SQLAlchemy
 gunicorn
 requests
 cfscrape
+beautifulsoup4
 jieba

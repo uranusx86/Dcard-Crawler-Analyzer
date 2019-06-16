@@ -13,6 +13,7 @@ python3
 * gunicorn
 * requests
 * cfscrape
+* beautifulsoup4
 * jieba
 
 ## apt package
@@ -45,6 +46,6 @@ python3 meteor.py   # for Meteor
 # Docker image
 You can also build crawler from dockerfile
 ```bash=
-docker build uranusx86/ForumCrawler
-docker run -dt --name forum_crawler -p 8080:80 uranusx86/ForumCrawler
+docker build . --tag uranusx86/forum_crawler --no-cache
+docker run -dt --name forumcrawler -p 80:8000 uranusx86/forum_crawler
 ```
