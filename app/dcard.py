@@ -67,7 +67,7 @@ class Dcard_crawler(Crawler):
             try:
                 query_url = query_api + ("&before="+str(before) if before != 0 else "")
                 article_list_str = self.retry_if_fail(query_url, retry_num=5, delay_time=5, error_msg="Get article list fail! before: {}".format(before))
-                article_list = self.response_decode(article_list_str)
+                article_list = self.response_decode(article_list_str.content.decode("utf-8"))
 
                 for article_info in article_list:
                     yield article_info
@@ -91,7 +91,7 @@ class Dcard_crawler(Crawler):
                 #time.sleep(random.uniform(0.5,1.0))
                 query_api = self.proxy + self.article_url.format(article["id"])
                 article_encode_str = self.retry_if_fail(query_api, retry_num=5, delay_time=5, error_msg="Get article fail! post id: {}".format(article["id"]))
-                article = self.response_decode(article_encode_str)
+                article = self.response_decode(article_encode_str.content.decode("utf-8"))
 
                 if "error" in article:
                     logging.info("article may delete, id {}".format( str(article["id"]) ))
@@ -131,7 +131,7 @@ class Dcard_crawler(Crawler):
                         #time.sleep(random.uniform(0.5,1.0))
                         query_api = self.proxy + self.comment_url.format(article["id"], comt_ind, kw['limit'])
                         comments_encode_str = self.retry_if_fail(query_api, retry_num=5, delay_time=5, error_msg="Get comment fail! post id: {}, after: {}".format(article["id"], comt_ind))
-                        comments = self.response_decode(comments_encode_str)
+                        comments = self.response_decode(comments_encode_str.content.decode("utf-8"))
                         if type(comments) is dict and 'error' in comments:
                             continue
                         for a_comment in comments:
@@ -156,9 +156,9 @@ class Dcard_crawler(Crawler):
 
     def save_data(self, article_gen, comt_gen):
         for article in article_gen:
-            article_origin = dcard_articles.query.filter_by(art_id=article["id"]).first()
+            updated_article = dcard_articles.query.filter_by(art_id=article["id"]).first()
             try:
-                if article_origin is None:
+                if updated_article is None:
                     new_artl = dcard_articles(
                                     id = article["id"],
                                     gender = 0 if article["gender"] == 'F' else 1,
@@ -170,8 +170,7 @@ class Dcard_crawler(Crawler):
                     db.session.add(new_artl)
                 else:
                     # update article
-                    article["content"] = self.compare_modify_list(article["content"], article_origin.art_content)
-                    updated_article = dcard_articles.query.filter_by( art_id = article["id"] ).first()
+                    article["content"] = self.compare_modify_list(article["content"], updated_article.art_content)
                     updated_article.art_content = article["content"]
             except Exception as e:
                 local_var_key = locals()

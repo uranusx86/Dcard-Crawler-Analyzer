@@ -8,19 +8,22 @@ class Crawler(metaclass=abc.ABCMeta):  # Abstract base class
     def __init__(self, req_module=requests):
         self.req = req_module
 
-    def retry_if_fail(self, query_api, retry_num, delay_time, error_msg):
+    def retry_if_fail(self, query_api, retry_num, delay_time, http_method="get", post_data="", error_msg=""):
+        result = {}
         for _ in range(retry_num):
             try:
-                resp = self.req.get( query_api )
-                result = resp.content.decode("utf-8")
-                if result is not None and result != "":
+                if http_method == "get":
+                    resp = self.req.get( query_api )
+                else:
+                    resp = self.req.post(query_api, headers=self.headers, json=post_data)
+                if resp.status_code == 200 or resp.status_code == 403:
                     break
                 logging.error(error_msg)
                 logging.error(resp.status_code)
                 time.sleep(delay_time)
             except Exception as e:
                 logging.error(traceback.format_exc())
-        return result
+        return resp
 
     '''
     def str_insert(string, new_string, insert_index):
@@ -130,12 +133,17 @@ def generators_factory(iterable):
 
         def gen(mydeque):
             while True:
-                if not mydeque:             # when the local deque is empty
-                    newval = next(it)       # fetch a new value and
-                    already_gone.append(newval)
-                    for d in deques:        # load it to all the deques
-                        d.append(newval)
-                yield mydeque.popleft()
+                try:
+                    if not mydeque:             # when the local deque is empty
+                        newval = next(it)       # fetch a new value and
+                        already_gone.append(newval)
+                        for d in deques:        # load it to all the deques
+                            d.append(newval)
+                    yield mydeque.popleft()
+                except Exception as e:
+                    if len(mydeque) == 0:
+                        break
+                    pass    # skip next(it) stop iteration exception, deque.popleft() empty exception
 
         return gen(new_deque)
 
